@@ -26,3 +26,11 @@ Route::middleware( 'api' )->group( function () {
     Route::put( '/todos/{id}', [TodoController::class, 'update'] )->name( 'todos.update' );
     Route::delete( '/todos/{id}', [TodoController::class, 'destroy'] )->name( 'todos.destroy' );
 } );
+
+Route::middleware( 'auth:api' )->group( function () {
+    Route::get( 'users', [UserController::class, 'index'] ); // Get a list of users (paginated)
+    Route::post( 'users', [UserController::class, 'store'] ); // Create a new user
+    Route::get( 'users/{id}', [UserController::class, 'show'] ); // Get a specific user by ID
+    Route::put( 'users/{id}', [UserController::class, 'update'] ); // Update a user by ID
+    Route::delete( 'users/{id}', [UserController::class, 'destroy'] ); // Delete a user by ID
+} );
