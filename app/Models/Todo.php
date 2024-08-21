@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\UserTodo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,6 +14,11 @@ class Todo extends Model {
     protected $fillable = [
         'title',
         'description',
+        'status',
+        'priority',
+        'due_date',
+        'completed_at',
+        'comments',
     ];
 
     protected static function boot() {
@@ -25,6 +31,22 @@ class Todo extends Model {
         } );
     }
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'completed_at', 'due_date'];
+
+    /**
+     * Get the full description of the todo item.
+     *
+     * @return string
+     */
+    public function getFullDescriptionAttribute() {
+        return "{$this->title}: {$this->description}";
+    }
+
+    /**
+     * Get the users associated with the todo.
+     */
+    public function userTodos() {
+        return $this->hasMany( UserTodo::class, 'todo_id' );
+    }
 
 }

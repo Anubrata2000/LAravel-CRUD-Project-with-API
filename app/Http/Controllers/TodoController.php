@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TodoRequest;
 use App\Http\Services\TodoService;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class TodoController extends Controller {
@@ -13,69 +14,46 @@ class TodoController extends Controller {
         $this->todoService = new TodoService();
     }
 
-    public function index() {
-        $todos = $this->todoService->getAllTodos();
-        // return response()->json( [
-        //     'message' => __( 'message.todo.todos_retrieved_successfully' ),
-        //     'todos'   => $todos,
-        // ] );
-        return renderJsonResponse( trans( 'message.todo.todos_retrieved_successfully' ), Response::HTTP_OK );
+    public function index( Request $request ) {
+        $rowsPerPage = $request->input( 'rowsPerPage', 10 ); // Default to 10 rows per page if not provided
+        $todos = $this->todoService->getAllTodos( $rowsPerPage );
+
+        return renderJsonResponse( trans( 'message.todo.todos_retrieved_successfully' ), Response::HTTP_OK, $todos );
     }
 
     public function show( $id ) {
         $todo = $this->todoService->getTodoById( $id );
 
         if ( !$todo ) {
-            return response()->json( ['error' => __( 'message.todo.not_found' )], 404 );
+            return renderJsonResponse( trans( 'message.todo.not_found' ), Response::HTTP_NOT_FOUND );
         }
 
-        return response()->json( [
-            'message' => __( 'message.todo.retrieved_successfully' ),
-            'todo'    => $todo,
-        ] );
+        return renderJsonResponse( trans( 'message.todo.retrieved_successfully' ), Response::HTTP_OK, $todo );
     }
 
     public function store( TodoRequest $request ) {
         $todo = $this->todoService->createTodo( $request->validated() );
 
-        $response = [
-            'id'          => $todo->id,
-            'title'       => $todo->title,
-            'description' => $todo->description,
-            'updated_at'  => $todo->updated_at,
-            'created_at'  => $todo->created_at,
-        ];
-
-        return response()->json( [
-            'message' => __( 'message.todo.created_successfully' ),
-            'todo'    => $response,
-        ], 201 );
+        return renderJsonResponse( trans( 'message.todo.created_successfully' ), Response::HTTP_CREATED, $todo );
     }
 
     public function update( TodoRequest $request, $id ) {
-        $todo = $this->todoService->getTodoById( $id );
-
-        if ( !$todo ) {
-            return response()->json( ['error' => __( 'message.todo.not_found' )], 404 );
-        }
-
         $todo = $this->todoService->updateTodo( $id, $request->validated() );
 
-        return response()->json( [
-            'message' => __( 'message.todo.updated_successfully' ),
-            'todo'    => $todo,
-        ] );
+        if ( !$todo ) {
+            return renderJsonResponse( trans( 'message.todo.not_found' ), Response::HTTP_NOT_FOUND );
+        }
+
+        return renderJsonResponse( trans( 'message.todo.updated_successfully' ), Response::HTTP_OK, $todo );
     }
 
     public function destroy( $id ) {
-        $todo = $this->todoService->getTodoById( $id );
+        $deleted = $this->todoService->deleteTodo( $id );
 
-        if ( !$todo ) {
-            return response()->json( ['error' => __( 'message.todo.not_found' )], 404 );
+        if ( !$deleted ) {
+            return renderJsonResponse( trans( 'message.todo.not_found' ), Response::HTTP_NOT_FOUND );
         }
 
-        $this->todoService->deleteTodo( $id );
-
-        return response()->json( ['message' => __( 'message.todo.deleted_successfully' )] );
+        return renderJsonResponse( trans( 'message.todo.deleted_successfully' ), Response::HTTP_OK );
     }
 }

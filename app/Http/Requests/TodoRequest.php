@@ -19,8 +19,13 @@ class TodoRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'title'       => 'required|string',
-            'description' => 'nullable|string',
+            'title'        => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'status'       => 'required|in:Pending,In Progress,Completed',
+            'priority'     => 'required|in:Low,Medium,High',
+            'due_date'     => 'nullable|date',
+            'completed_at' => 'nullable|date',
+            'comments'     => 'nullable|string',
         ];
     }
 }

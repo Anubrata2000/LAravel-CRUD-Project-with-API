@@ -10,9 +10,14 @@ return new class extends Migration {
      */
     public function up(): void {
         Schema::create( 'todos', function ( Blueprint $table ) {
-            $table->string( 'id', 45 )->primary();
-            $table->string( 'title' );
-            $table->text( 'description' )->nullable();
+            $table->string( 'id', 45 )->primary(); // UUID
+            $table->string( 'title' ); // Title of the task
+            $table->text( 'description' )->nullable(); // Detailed description of the task
+            $table->enum( 'status', ['Pending', 'In Progress', 'Completed'] )->default( 'Pending' ); // Status of the task
+            $table->enum( 'priority', ['Low', 'Medium', 'High'] )->default( 'Medium' ); // Priority level
+            $table->date( 'due_date' )->nullable(); // Due date of the task
+            $table->timestamp( 'completed_at' )->nullable(); // When the task was completed
+            $table->text( 'comments' )->nullable(); // Additional comments or notes
             $table->softDeletes();
             $table->timestamps();
         } );
