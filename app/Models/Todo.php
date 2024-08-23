@@ -11,6 +11,9 @@ use Ramsey\Uuid\Uuid;
 class Todo extends Model {
     use HasFactory, SoftDeletes;
 
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'title',
         'description',
