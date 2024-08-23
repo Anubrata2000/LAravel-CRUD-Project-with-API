@@ -17,5 +17,7 @@ return [
         'deleted_successfully'         => 'User deleted successfully',
         'retrieved_successfully'       => 'User retrieved successfully',
         'users_retrieved_successfully' => 'All users retrieved successfully',
+        'login_successful'             => 'Login successful.',
+        'login_failed'                 => 'Login failed. Please check your credentials.',
     ],
 ];
