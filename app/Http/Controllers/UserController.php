@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller {
     protected $user;
 
     public function __construct() {
-        $this->middleware( 'auth' );
         $this->user = new User();
     }
 
@@ -32,15 +34,15 @@ class UserController extends Controller {
      */
     public function store( UserRequest $request ) {
         $user = $this->user->create( [
-            'name'     => $request->input( 'name' ),
-            'email'    => $request->input( 'email' ),
-            'password' => bcrypt( $request->input( 'password' ) ),
+            'name'              => $request->input( 'name' ),
+            'email'             => $request->input( 'email' ),
+            'password'          => bcrypt( $request->input( 'password' ) ),
+            'email_verified_at' => Carbon::now(),
         ] );
 
         return renderJsonResponse(
             trans( 'message.user.created_successfully' ),
             Response::HTTP_CREATED,
-            $user
         );
     }
 
@@ -86,7 +88,6 @@ class UserController extends Controller {
         return renderJsonResponse(
             trans( 'message.user.updated_successfully' ),
             Response::HTTP_OK,
-            $user
         );
     }
 
@@ -110,4 +111,49 @@ class UserController extends Controller {
             Response::HTTP_OK
         );
     }
+
+    /**
+     * Login the user and return a token.
+     */
+    public function login( LoginRequest $request ) {
+        $credentials = $request->only( 'email', 'password' );
+
+        if ( Auth::attempt( $credentials ) ) {
+            $user = Auth::user();
+            $token = $user->createToken( 'authToken' )->plainTextToken;
+
+            return renderJsonResponse(
+                trans( 'message.user.login_successful' ),
+                Response::HTTP_OK,
+                [
+                    'token' => $token,
+                    'user'  => $user,
+                ]
+            );
+        }
+
+        return renderJsonResponse(
+            trans( 'message.user.login_failed' ),
+            Response::HTTP_UNAUTHORIZED
+        );
+    }
+
+    /**
+     * Log the user out and invalidate the token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout() {
+        // Get the currently authenticated user
+        $user = Auth::user();
+
+        // Revoke the user's current token
+        $user->tokens()->delete();
+
+        return renderJsonResponse(
+            trans( 'message.user.logout_successful' ),
+            Response::HTTP_OK
+        );
+    }
+
 }
