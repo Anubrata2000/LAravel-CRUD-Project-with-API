@@ -19,5 +19,7 @@ return [
         'users_retrieved_successfully' => 'All users retrieved successfully',
         'login_successful'             => 'Login successful.',
         'login_failed'                 => 'Login failed. Please check your credentials.',
+        'logout_successful'            => 'Logout sucessful.',
+        'logout_failed'                => 'Logout failed.',
     ],
 ];

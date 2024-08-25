@@ -39,5 +39,5 @@ Route::post( 'users', [UserController::class, 'store'] ); // Create a new user
 Route::post( '/login', [UserController::class, 'login'] );
 
 Route::middleware( 'auth:sanctum' )->group( function () {
-    Route::get( '/logout', [UserController::class, 'logout'] );
+    Route::post( 'logout', [UserController::class, 'logout'] )->name( 'logout' );
 } );

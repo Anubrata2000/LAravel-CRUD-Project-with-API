@@ -146,13 +146,21 @@ class UserController extends Controller {
     public function logout() {
         // Get the currently authenticated user
         $user = Auth::user();
+        dd( $user );
 
-        // Revoke the user's current token
-        $user->tokens()->delete();
+        if ( $user ) {
+            // Revoke the user's current token
+            $user->currentAccessToken()->delete();
+
+            return renderJsonResponse(
+                trans( 'message.user.logout_successful' ),
+                Response::HTTP_OK
+            );
+        }
 
         return renderJsonResponse(
-            trans( 'message.user.logout_successful' ),
-            Response::HTTP_OK
+            trans( 'message.user.logout_failed' ),
+            Response::HTTP_UNAUTHORIZED
         );
     }
 
